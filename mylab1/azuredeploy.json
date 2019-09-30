@@ -1,21 +1,51 @@
 {
     "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
-    "parameters": {},
-    "variables": {},
+    "parameters": {
+        "storageAccountPrefix": {
+            "type": "string",
+            "defaultValue": "pladhanistg",
+            "maxLength": 11,
+            "metadata": {
+                "description": "Prefix for the storage account"
+            }
+        },
+        "accountType": {
+            "type": "string",
+            "defaultValue": "Standard_LRS",
+            "allowedValues": [
+                "Standard_LRS",
+                "Standard_ZRS",
+                "Standard_GRS",
+                "Premium_LRS",
+                "Standard_RAGRS"
+            ],
+            "metadata": {
+                "description": "SKU Type for the storage account"
+            }
+        }
+    },
+    "variables": {
+        "storageAccount": "[toLower(concat(parameters('storageAccountPrefix'), uniqueString(resourceGroup().id)))]"
+    },
     "resources": [
         {
-            "name": "pladhanistgacct",
+            "name": "[variables('storageAccount')]",
             "type": "Microsoft.Storage/storageAccounts",
             "apiVersion": "2015-06-15",
             "location": "[resourceGroup().location]",
             "tags": {
-                "displayName": "pladhanistgacct"
+                "displayName": "[variables('storageAccount')]"
             },
             "properties": {
-                "accountType": "Standard_LRS"
+                "accountType": "[parameters('accountType')]"
             }
         }
     ],
-    "outputs": {}
+    "outputs": {
+        "storageAccount": {
+            "type": "string",
+            "value": "[variables('storageAccount')]"
+        }
+    }
 }
